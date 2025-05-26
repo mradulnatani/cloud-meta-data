@@ -5,7 +5,6 @@ sudo apt install python3-venv
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
-https://github.com/mradulnatani/cloud-meta-data.git
 cd cloud-meta-data
 python3 -m venv venv
 source venv/bin/activate
