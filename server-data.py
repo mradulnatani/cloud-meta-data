@@ -44,15 +44,19 @@ def get_instance_tag_values(instance_id, region):
         print(f"Unexpected error: {e}")
         return []
 
-# Step 4: Send tag values to Django
-def send_tags_to_django(tags):
+# Step 4: Send tag values + public IP to Django
+def send_tags_to_django(tags, public_ip):
     try:
-        api_url  = "https://6583-14-139-240-228.ngrok-free.app/api/receive-tags/"
+        api_url  = "https://989ff60397d8.ngrok-free.app/api/receive-tags/"
         headers = {'Content-Type': 'application/json'}
-        response = requests.post(api_url, json={"tags": tags}, headers=headers, timeout=5)
-        print(f"Tags sent to Django (status {response.status_code}): {response.text}")
+        payload = {
+            "tags": tags,
+            "public_ip": public_ip
+        }
+        response = requests.post(api_url, json=payload, headers=headers, timeout=5)
+        print(f"Tags + public IP sent to Django (status {response.status_code}): {response.text}")
     except Exception as e:
-        print(f"Failed to send tags to Django: {e}")
+        print(f"Failed to send data to Django: {e}")
 
 # Step 5: Main logic
 def main():
@@ -64,6 +68,7 @@ def main():
     instance_id = get_metadata("instance-id", token)
     az = get_metadata("placement/availability-zone", token)
     region = az[:-1] if az else ""
+    public_ip = get_metadata("public-ipv4", token)
 
     if not instance_id or not region:
         print("Instance ID or Region is missing")
@@ -71,13 +76,13 @@ def main():
 
     tags = get_instance_tag_values(instance_id, region)
     print("Retrieved tag values:", tags)
+    print("Public IP:", public_ip)
 
-    if tags:
-        send_tags_to_django(tags)
+    if tags or public_ip:
+        send_tags_to_django(tags, public_ip)
     else:
-        print("No tag values to send")
+        print("No data to send")
 
 if __name__ == "__main__":
     main()
-
 
